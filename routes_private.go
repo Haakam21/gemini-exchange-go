@@ -277,3 +277,56 @@ func (api *Api) WithdrawFunds(currency, address string, amount float64) (Withdra
 
 	return res, nil
 }
+
+const ACCOUNTS_URI = "/v1/account/list"
+
+type Account struct {
+	Id             string `json:"account"`
+	Name           string `json:"name"`
+	Type           string `json:"type"`
+	CounterpartyId string `json:"counterparty_id"`
+	CreatedAt      int64  `json:"created"`
+}
+
+// Get Accounts
+func (api *Api) GetAccounts() ([]Account, error) {
+
+	url := api.url + ACCOUNTS_URI
+	params := map[string]interface{}{
+		"request": ACCOUNTS_URI,
+		"nonce":   Nonce(),
+	}
+
+	var accounts []Account
+
+	body, err := api.request("POST", url, params)
+	if err != nil {
+		return accounts, err
+	}
+
+	json.Unmarshal(body, &accounts)
+
+	return accounts, nil
+}
+
+func (api *Api) CreateAccount(name string, Type string) (Account, error) {
+
+	url := api.url + "/v1/account/create"
+	params := map[string]interface{}{
+		"request": "/v1/account/create",
+		"nonce":   Nonce(),
+		"name":    name,
+		"type":    Type,
+	}
+
+	var account Account
+
+	body, err := api.request("POST", url, params)
+	if err != nil {
+		return account, err
+	}
+
+	json.Unmarshal(body, &account)
+
+	return account, nil
+}
