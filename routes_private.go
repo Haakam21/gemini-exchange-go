@@ -1,18 +1,19 @@
-package gemini
+package geminix
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
 // Past Trades
-func (api *Api) PastTrades(symbol string, limitTrades int, timestamp int64) ([]Trade, error) {
-
-	url := api.url + PAST_TRADES_URI
+func (c *Client) PastTrades(symbol string, limitTrades int, timestamp int64) ([]Trade, error) {
+	uri := PastTradesUri
+	url := c.url + uri
 
 	params := map[string]interface{}{
-		"request":      PAST_TRADES_URI,
-		"nonce":        Nonce(),
+		"request":      uri,
+		"nonce":        nonce(),
 		"symbol":       symbol,
 		"limit_trades": limitTrades,
 		"timestamp":    timestamp,
@@ -20,7 +21,7 @@ func (api *Api) PastTrades(symbol string, limitTrades int, timestamp int64) ([]T
 
 	var trades []Trade
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return nil, err
 	}
@@ -31,17 +32,18 @@ func (api *Api) PastTrades(symbol string, limitTrades int, timestamp int64) ([]T
 }
 
 // Trade Volume
-func (api *Api) TradeVolume() ([][]TradeVolume, error) {
+func (c *Client) TradeVolume() ([][]TradeVolume, error) {
+	uri := TradeVolumeUri
+	url := c.url + uri
 
-	url := api.url + TRADE_VOLUME_URI
 	params := map[string]interface{}{
-		"request": TRADE_VOLUME_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
 	var volumes [][]TradeVolume
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return volumes, err
 	}
@@ -52,17 +54,18 @@ func (api *Api) TradeVolume() ([][]TradeVolume, error) {
 }
 
 // Active Orders
-func (api *Api) ActiveOrders() ([]Order, error) {
+func (c *Client) ActiveOrders() ([]Order, error) {
+	uri := ActiveOrdersUri
+	url := c.url + uri
 
-	url := api.url + ACTIVE_ORDERS_URI
 	params := map[string]interface{}{
-		"request": ACTIVE_ORDERS_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
 	var orders []Order
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return nil, err
 	}
@@ -73,18 +76,19 @@ func (api *Api) ActiveOrders() ([]Order, error) {
 }
 
 // Order Status
-func (api *Api) OrderStatus(orderId string) (Order, error) {
+func (c *Client) OrderStatus(orderId string) (Order, error) {
+	uri := OrderStatusUri
+	url := c.url + uri
 
-	url := api.url + ORDER_STATUS_URI
 	params := map[string]interface{}{
-		"request":  ORDER_STATUS_URI,
-		"nonce":    Nonce(),
+		"request":  uri,
+		"nonce":    nonce(),
 		"order_id": orderId,
 	}
 
 	var order Order
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return order, err
 	}
@@ -95,12 +99,13 @@ func (api *Api) OrderStatus(orderId string) (Order, error) {
 }
 
 // New Order
-func (api *Api) NewOrder(symbol, clientOrderId string, amount, price float64, side string, options []string) (Order, error) {
+func (c *Client) NewOrder(symbol, clientOrderId string, amount, price float64, side string, options []string) (Order, error) {
+	uri := NewOrderUri
+	url := c.url + uri
 
-	url := api.url + NEW_ORDER_URI
 	params := map[string]interface{}{
-		"request":         NEW_ORDER_URI,
-		"nonce":           Nonce(),
+		"request":         uri,
+		"nonce":           nonce(),
 		"client_order_id": clientOrderId,
 		"symbol":          symbol,
 		"amount":          strconv.FormatFloat(amount, 'f', -1, 64),
@@ -115,7 +120,7 @@ func (api *Api) NewOrder(symbol, clientOrderId string, amount, price float64, si
 
 	var order Order
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return order, err
 	}
@@ -126,18 +131,19 @@ func (api *Api) NewOrder(symbol, clientOrderId string, amount, price float64, si
 }
 
 // Cancel Order
-func (api *Api) CancelOrder(orderId string) (Order, error) {
+func (c *Client) CancelOrder(orderId string) (Order, error) {
+	uri := CancelOrderUri
+	url := c.url + uri
 
-	url := api.url + CANCEL_ORDER_URI
 	params := map[string]interface{}{
-		"request":  CANCEL_ORDER_URI,
-		"nonce":    Nonce(),
+		"request":  uri,
+		"nonce":    nonce(),
 		"order_id": orderId,
 	}
 
 	var order Order
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return order, err
 	}
@@ -148,17 +154,18 @@ func (api *Api) CancelOrder(orderId string) (Order, error) {
 }
 
 // Cancel All
-func (api *Api) CancelAll() (CancelResult, error) {
+func (c *Client) CancelAll() (CancelResult, error) {
+	uri := CancelAllUri
+	url := c.url + uri
 
-	url := api.url + CANCEL_ALL_URI
 	params := map[string]interface{}{
-		"request": CANCEL_ALL_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
 	var res CancelResult
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return res, err
 	}
@@ -169,17 +176,18 @@ func (api *Api) CancelAll() (CancelResult, error) {
 }
 
 // Cancel Session
-func (api *Api) CancelSession() (GenericResponse, error) {
+func (c *Client) CancelSession() (Response, error) {
+	uri := CancelSessionUri
+	url := c.url + uri
 
-	url := api.url + CANCEL_SESSION_URI
 	params := map[string]interface{}{
-		"request": CANCEL_SESSION_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
-	var res GenericResponse
+	var res Response
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return res, err
 	}
@@ -190,17 +198,18 @@ func (api *Api) CancelSession() (GenericResponse, error) {
 }
 
 // Heartbeat
-func (api *Api) Heartbeat() (GenericResponse, error) {
+func (c *Client) Heartbeat() (Response, error) {
+	uri := HeartbeatUri
+	url := c.url + uri
 
-	url := api.url + HEARTBEAT_URI
 	params := map[string]interface{}{
-		"request": HEARTBEAT_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
-	var res GenericResponse
+	var res Response
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return res, err
 	}
@@ -211,17 +220,18 @@ func (api *Api) Heartbeat() (GenericResponse, error) {
 }
 
 // Balances
-func (api *Api) Balances() ([]FundBalance, error) {
+func (c *Client) Balances() ([]FundBalance, error) {
+	uri := BalancesUri
+	url := c.url + uri
 
-	url := api.url + BALANCES_URI
 	params := map[string]interface{}{
-		"request": BALANCES_URI,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 	}
 
 	var balances []FundBalance
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return balances, err
 	}
@@ -232,19 +242,19 @@ func (api *Api) Balances() ([]FundBalance, error) {
 }
 
 // New Deposit Address
-func (api *Api) NewDepositAddress(currency, label string) (DepositAddress, error) {
+func (c *Client) NewDepositAddress(currency, label string) (DepositAddress, error) {
+	uri := fmt.Sprintf(NewDepositAddressUri, currency)
+	url := c.url + uri
 
-	path := NEW_DEPOSIT_ADDRESS_URI + currency + "/newAddress"
-	url := api.url + path
 	params := map[string]interface{}{
-		"request": path,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 		"label":   label,
 	}
 
 	var res DepositAddress
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return res, err
 	}
@@ -255,20 +265,20 @@ func (api *Api) NewDepositAddress(currency, label string) (DepositAddress, error
 }
 
 // Withdraw Crypto Funds
-func (api *Api) WithdrawFunds(currency, address string, amount float64) (WithdrawFundsResult, error) {
+func (c *Client) WithdrawFunds(currency, address string, amount float64) (WithdrawFundsResult, error) {
+	uri := fmt.Sprintf(WithdrawCryptoUri, currency)
+	url := c.url + uri
 
-	path := WITHDRAW_FUNDS_URI + currency
-	url := api.url + path
 	params := map[string]interface{}{
-		"request": path,
-		"nonce":   Nonce(),
+		"request": uri,
+		"nonce":   nonce(),
 		"address": address,
 		"amount":  strconv.FormatFloat(amount, 'f', -1, 64),
 	}
 
 	var res WithdrawFundsResult
 
-	body, err := api.request("POST", url, params)
+	body, err := c.request("POST", url, params)
 	if err != nil {
 		return res, err
 	}
@@ -276,57 +286,4 @@ func (api *Api) WithdrawFunds(currency, address string, amount float64) (Withdra
 	json.Unmarshal(body, &res)
 
 	return res, nil
-}
-
-const ACCOUNTS_URI = "/v1/account/list"
-
-type Account struct {
-	Id             string `json:"account"`
-	Name           string `json:"name"`
-	Type           string `json:"type"`
-	CounterpartyId string `json:"counterparty_id"`
-	CreatedAt      int64  `json:"created"`
-}
-
-// Get Accounts
-func (api *Api) GetAccounts() ([]Account, error) {
-
-	url := api.url + ACCOUNTS_URI
-	params := map[string]interface{}{
-		"request": ACCOUNTS_URI,
-		"nonce":   Nonce(),
-	}
-
-	var accounts []Account
-
-	body, err := api.request("POST", url, params)
-	if err != nil {
-		return accounts, err
-	}
-
-	json.Unmarshal(body, &accounts)
-
-	return accounts, nil
-}
-
-func (api *Api) CreateAccount(name string, Type string) (Account, error) {
-
-	url := api.url + "/v1/account/create"
-	params := map[string]interface{}{
-		"request": "/v1/account/create",
-		"nonce":   Nonce(),
-		"name":    name,
-		"type":    Type,
-	}
-
-	var account Account
-
-	body, err := api.request("POST", url, params)
-	if err != nil {
-		return account, err
-	}
-
-	json.Unmarshal(body, &account)
-
-	return account, nil
 }

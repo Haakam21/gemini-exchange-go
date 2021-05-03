@@ -1,4 +1,4 @@
-package gemini
+package geminix
 
 type MarketData struct {
 	Type    string        `json:"type"`

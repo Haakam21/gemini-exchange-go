@@ -1,18 +1,19 @@
-package gemini
+package geminix
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
 // Symbols
-func (api *Api) Symbols() ([]string, error) {
-
-	url := api.url + SYMBOLS_URI
+func (c *Client) Symbols() ([]string, error) {
+	uri := SymbolsUri
+	url := c.url + uri
 
 	var symbols []string
 
-	body, err := api.request("GET", url, nil)
+	body, err := c.request("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -23,13 +24,13 @@ func (api *Api) Symbols() ([]string, error) {
 }
 
 // Ticker
-func (api *Api) Ticker(symbol string) (Ticker, error) {
-
-	url := api.url + TICKER_URI + symbol
+func (c *Client) Ticker(symbol string) (Ticker, error) {
+	uri := fmt.Sprintf(TickerUri, symbol)
+	url := c.url + uri
 
 	var ticker Ticker
 
-	body, err := api.request("GET", url, nil)
+	body, err := c.request("GET", url, nil)
 	if err != nil {
 		return ticker, err
 	}
@@ -40,9 +41,10 @@ func (api *Api) Ticker(symbol string) (Ticker, error) {
 }
 
 // Order Book
-func (api *Api) OrderBook(symbol string, limitBids, limitAsks int) (Book, error) {
+func (c *Client) OrderBook(symbol string, limitBids, limitAsks int) (Book, error) {
+	uri := fmt.Sprintf(OrderBookUri, symbol)
+	url := c.url + uri
 
-	url := api.url + BOOK_URI + symbol
 	params := map[string]interface{}{
 		"limit_bids": strconv.Itoa(limitBids),
 		"limit_asks": strconv.Itoa(limitAsks),
@@ -50,7 +52,7 @@ func (api *Api) OrderBook(symbol string, limitBids, limitAsks int) (Book, error)
 
 	var book Book
 
-	body, err := api.request("GET", url, params)
+	body, err := c.request("GET", url, params)
 	if err != nil {
 		return book, err
 	}
@@ -61,9 +63,10 @@ func (api *Api) OrderBook(symbol string, limitBids, limitAsks int) (Book, error)
 }
 
 // Trades
-func (api *Api) Trades(symbol string, since int64, limitTrades int, includeBreaks bool) ([]Trade, error) {
+func (c *Client) Trades(symbol string, since int64, limitTrades int, includeBreaks bool) ([]Trade, error) {
+	uri := fmt.Sprintf(TradesUri, symbol)
+	url := c.url + uri
 
-	url := api.url + TRADES_URI + symbol
 	params := map[string]interface{}{
 		"since":          strconv.Itoa(int(since)),
 		"limit_trades":   strconv.Itoa(limitTrades),
@@ -72,7 +75,7 @@ func (api *Api) Trades(symbol string, since int64, limitTrades int, includeBreak
 
 	var res []Trade
 
-	body, err := api.request("GET", url, params)
+	body, err := c.request("GET", url, params)
 	if err != nil {
 		return nil, err
 	}
@@ -83,13 +86,13 @@ func (api *Api) Trades(symbol string, since int64, limitTrades int, includeBreak
 }
 
 // Current Auction
-func (api *Api) CurrentAuction(symbol string) (CurrentAuction, error) {
-
-	url := api.url + AUCTION_URI + symbol
+func (c *Client) CurrentAuction(symbol string) (CurrentAuction, error) {
+	uri := fmt.Sprintf(TradesUri, symbol)
+	url := c.url + uri
 
 	var auction CurrentAuction
 
-	body, err := api.request("GET", url, nil)
+	body, err := c.request("GET", url, nil)
 	if err != nil {
 		return auction, err
 	}
@@ -100,9 +103,10 @@ func (api *Api) CurrentAuction(symbol string) (CurrentAuction, error) {
 }
 
 // Auction History
-func (api *Api) AuctionHistory(symbol string, since int64, limit int, includeIndicative bool) ([]Auction, error) {
+func (c *Client) AuctionHistory(symbol string, since int64, limit int, includeIndicative bool) ([]Auction, error) {
+	uri := fmt.Sprintf(AuctionHistoryUri, symbol)
+	url := c.url + uri
 
-	url := api.url + AUCTION_URI + symbol + "/history"
 	params := map[string]interface{}{
 		"since":                 strconv.Itoa(int(since)),
 		"limit_auction_results": strconv.Itoa(limit),
@@ -111,7 +115,7 @@ func (api *Api) AuctionHistory(symbol string, since int64, limit int, includeInd
 
 	var auctions []Auction
 
-	body, err := api.request("GET", url, params)
+	body, err := c.request("GET", url, params)
 	if err != nil {
 		return auctions, err
 	}

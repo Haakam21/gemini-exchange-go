@@ -1,4 +1,4 @@
-package gemini
+package geminix
 
 type Book struct {
 	Bids BookEntries `json:"bids,string"`

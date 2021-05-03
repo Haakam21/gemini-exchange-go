@@ -1,4 +1,4 @@
-package gemini
+package geminix
 
 import (
 	"bytes"
@@ -14,52 +14,91 @@ import (
 )
 
 const (
-	BASE_URL       = "https://api.gemini.com"
-	SANDBOX_URL    = "https://api.sandbox.gemini.com"
-	WS_BASE_URL    = "wss://api.gemini.com"
-	WS_SANDBOX_URL = "wss://api.sandbox.gemini.com"
+	BaseUrl          = "https://api.gemini.com"
+	WsBaseUrl        = "wss://api.gemini.com"
+	SandboxBaseUrl   = "https://api.sandbox.gemini.com"
+	SandboxWsBaseUrl = "wss://api.sandbox.gemini.com"
 
 	// public
-	SYMBOLS_URI = "/v1/symbols"
-	TICKER_URI  = "/v1/pubticker/"
-	BOOK_URI    = "/v1/book/"
-	TRADES_URI  = "/v1/trades/"
-	AUCTION_URI = "/v1/auction/"
+	SymbolsUri        = "/v1/symbols"
+	SymbolDetailsUri  = "/v1/symbols/details"
+	TickerUri         = "/v2/ticker/%s"
+	CandlesUri        = "/v2/candles/%s/%s"
+	OrderBookUri      = "/v1/book/%s"
+	TradesUri         = "/v1/trades/%s"
+	AuctionUri        = "/v1/auction/%s"
+	AuctionHistoryUri = "/v1/auction/%s/history"
 
-	// authenticated
-	PAST_TRADES_URI    = "/v1/mytrades"
-	TRADE_VOLUME_URI   = "/v1/tradevolume"
-	ACTIVE_ORDERS_URI  = "/v1/orders"
-	ORDER_STATUS_URI   = "/v1/order/status"
-	NEW_ORDER_URI      = "/v1/order/new"
-	CANCEL_ORDER_URI   = "/v1/order/cancel"
-	CANCEL_ALL_URI     = "/v1/order/cancel/all"
-	CANCEL_SESSION_URI = "/v1/order/cancel/session"
-	HEARTBEAT_URI      = "/v1/heartbeat"
+	// roles
+	RolesUri = "/v1/roles"
 
-	// fund mgmt
-	BALANCES_URI            = "/v1/balances"
-	NEW_DEPOSIT_ADDRESS_URI = "/v1/deposit/"
-	WITHDRAW_FUNDS_URI      = "/v1/withdraw/"
+	// order placement
+	NewOrderUri      = "/v1/order/new"
+	CancelOrderUri   = "/v1/order/cancel"
+	CancelSessionUri = "/v1/order/cancel/session"
+	CancelAllUri     = "/v1/order/cancel/all"
 
-	// websockets
-	ORDER_EVENTS_URI = "/v1/order/events"
-	MARKET_DATA_URI  = "/v1/marketdata/"
+	// order status
+	OrderStatusUri  = "/v1/order/status"
+	ActiveOrdersUri = "/v1/orders"
+	PastTradesUri   = "/v1/mytrades"
+
+	// fee and volume
+	NotationalVolumeUri = "/v1/notationalvolume"
+	TradeVolumeUri      = "/v1/tradevolume"
+
+	// clearing
+	NewClearingOrderUri     = "/v1/clearing/new"
+	NewBrokerOrderUri       = "/v1/broker/new"
+	ClearingOrderStatusUri  = "/v1/clearing/status"
+	CancelClearingOrderUri  = "/v1/clearing/cancel"
+	ConfirmClearingOrderUri = "/v1/clearing/confirm"
+
+	// fund management
+	BalancesUri           = "/v1/balances"
+	NotationalBalancesUri = "/v1/notionalbalances/%s"
+	TransfersUri          = "/v1/transfers"
+	DepositAddressesUri   = "/v1/addresses/%s"
+	NewDepositAddressUri  = "/v1/deposit/%s/newAddress"
+	WithdrawCryptoUri     = "/v1/withdraw/%s"
+	InternalTransferUri   = "/v1/account/transfer/%s"
+	AddBankUri            = "/v1/payments/addbank"
+	PaymentMethodsUri     = "/v1/payments/methods"
+
+	// approved address
+	RequestAddressUri    = "/v1/approvedAddresses/%s/request"
+	ApprovedAddressesUri = "/v1/approvedAddresses/account/%s"
+	RemoveAddressUri     = "/v1/approvedAddresses/%s/remove"
+
+	// account administration
+	AccountDetailUri = "/v1/account"
+	CreateAccountUri = "/v1/account/create"
+	AccountsUri      = "/v1/account/list"
+
+	// session
+	HeartbeatUri = "/v1/heartbeat"
 )
 
-type Api struct {
+type Client struct {
 	url    string
 	key    string
 	secret string
 }
 
-func New(live bool, key, secret string) *Api {
+func NewClient(key string, secret string, sandbox bool) *Client {
 	var url string
-	if url = SANDBOX_URL; live == true {
-		url = BASE_URL
+	if sandbox {
+		url = SandboxBaseUrl
+	} else {
+		url = BaseUrl
 	}
 
-	return &Api{url: url, key: key, secret: secret}
+	return &Client{url: url, key: key, secret: secret}
+}
+
+// nonce returns a generic nonce based on unix timestamp
+func nonce() int64 {
+	return time.Now().UnixNano()
 }
 
 type ApiError struct {
@@ -71,9 +110,100 @@ func (e *ApiError) Error() string {
 	return fmt.Sprintf("[%v] %v", e.Reason, e.Message)
 }
 
-type GenericResponse struct {
+type Response struct {
 	Result string
 	ApiError
+}
+
+// BuildHeader handles the conversion of post parameters into headers formatted
+// according to Gemini specification. Resulting headers include the API key,
+// the payload and the signature.
+func (c *Client) BuildHeader(req *map[string]interface{}) (http.Header, error) {
+
+	reqStr, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := base64.StdEncoding.EncodeToString([]byte(reqStr))
+
+	mac := hmac.New(sha512.New384, []byte(c.secret))
+	mac.Write([]byte(payload))
+
+	signature := hex.EncodeToString(mac.Sum(nil))
+
+	header := http.Header{}
+	header.Set("X-GEMINI-APIKEY", c.key)
+	header.Set("X-GEMINI-PAYLOAD", payload)
+	header.Set("X-GEMINI-SIGNATURE", signature)
+
+	return header, nil
+}
+
+// request makes the HTTP request to Gemini and handles any returned errors
+func (c *Client) request(verb string, uri string, params map[string]interface{}) ([]byte, error) {
+	url := c.url + uri
+
+	req, err := http.NewRequest(verb, url, bytes.NewBuffer([]byte{}))
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		if verb == "GET" {
+			q := req.URL.Query()
+			for key, val := range params {
+				q.Add(key, val.(string))
+			}
+			req.URL.RawQuery = q.Encode()
+		} else {
+			req.Header, err = c.BuildHeader(&params)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var res Response
+	json.Unmarshal(body, &res)
+	if res.Result == "error" {
+		return nil, &res.ApiError
+	}
+
+	return body, nil
+}
+
+func (c *Client) PublicRequest(uri string) ([]byte, error) {
+	body, err := c.request("GET", uri, nil)
+
+	return body, err
+}
+
+func (c *Client) PrivateRequest(uri string, params map[string]interface{}) ([]byte, error) {
+	if params == nil {
+		params = map[string]interface{}{
+			"request": uri,
+			"nonce":   nonce(),
+		}
+	} else {
+		params["request"] = uri
+		params["nonce"] = nonce()
+	}
+
+	body, err := c.request("POST", uri, params)
+	return body, err
 }
 
 type Id string
@@ -194,7 +324,7 @@ type Auction struct {
 }
 
 type CancelResult struct {
-	GenericResponse
+	Response
 	Details CancelResultDetails
 }
 
@@ -221,74 +351,4 @@ type WithdrawFundsResult struct {
 	Destination string  `json:"destination"`
 	TxHash      string  `json:"txHash"`
 	Amount      float64 `json:"amount,string"`
-}
-
-// Nonce returns a generic nonce based on unix timestamp
-func Nonce() int64 {
-	return time.Now().UnixNano()
-}
-
-// BuildHeader handles the conversion of post parameters into headers formatted
-// according to Gemini specification. Resulting headers include the API key,
-// the payload and the signature.
-func (api *Api) BuildHeader(req *map[string]interface{}) http.Header {
-
-	reqStr, _ := json.Marshal(req)
-	payload := base64.StdEncoding.EncodeToString([]byte(reqStr))
-
-	mac := hmac.New(sha512.New384, []byte(api.secret))
-	mac.Write([]byte(payload))
-
-	signature := hex.EncodeToString(mac.Sum(nil))
-
-	header := http.Header{}
-	header.Set("X-GEMINI-APIKEY", api.key)
-	header.Set("X-GEMINI-PAYLOAD", payload)
-	header.Set("X-GEMINI-SIGNATURE", signature)
-
-	return header
-}
-
-// request makes the HTTP request to Gemini and handles any returned errors
-func (api *Api) request(verb, url string, params map[string]interface{}) ([]byte, error) {
-
-	req, err := http.NewRequest(verb, url, bytes.NewBuffer([]byte{}))
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		if verb == "GET" {
-			q := req.URL.Query()
-			for key, val := range params {
-				q.Add(key, val.(string))
-			}
-			req.URL.RawQuery = q.Encode()
-		} else {
-			req.Header = api.BuildHeader(&params)
-		}
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// read response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	// check for error from Gemini
-	var res GenericResponse
-
-	json.Unmarshal(body, &res)
-	if res.Result == "error" {
-		return nil, &res.ApiError
-	}
-
-	return body, nil
 }
