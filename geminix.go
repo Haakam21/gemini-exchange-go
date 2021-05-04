@@ -79,6 +79,17 @@ const (
 	HeartbeatUri = "/v1/heartbeat"
 )
 
+type Network string
+
+const (
+	Bitcoin     Network = "bitcoin"
+	Ethereum    Network = "ethereum"
+	BitcoinCash Network = "bitcoincash"
+	Litecoin    Network = "litecoin"
+	ZCash       Network = "zcash"
+	Filecoin    Network = "filecoin"
+)
+
 type Client struct {
 	url    string
 	key    string
@@ -340,12 +351,6 @@ type FundBalance struct {
 	Available              float64 `json:"available,string"`
 	AvailableForWithdrawal float64 `json:"availableForWithdrawal,string"`
 }
-
-/*type DepositAddress struct {
-	Currency string `json:"currency"`
-	Address  string `json:"address"`
-	Label    string `json:"label"`
-}*/
 
 type WithdrawFundsResult struct {
 	Destination string  `json:"destination"`
