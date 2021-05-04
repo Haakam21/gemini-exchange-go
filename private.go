@@ -50,7 +50,7 @@ type DepositAddress struct {
 	Label     string `json:"label,omitempty"`
 }
 
-func (c *Client) GetDepositAddresses(network string, accountId string) ([]DepositAddress, error) {
+func (c *Client) GetDepositAddresses(network Network, accountId string) ([]DepositAddress, error) {
 	uri := fmt.Sprintf(DepositAddressesUri, network)
 
 	params := map[string]interface{}{
