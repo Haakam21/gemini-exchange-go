@@ -6,11 +6,13 @@ import (
 )
 
 type Account struct {
-	Id             string `json:"account"`
 	Name           string `json:"name"`
-	Type           string `json:"type"`
+	AccountName    string `json:"accountName"`
+	Account        string `json:"account"`
+	ShortName      string `json:"shortName"`
 	CounterpartyId string `json:"counterparty_id"`
-	CreatedAt      int64  `json:"created"`
+	Type           string `json:"type"`
+	Created        uint64 `json:"created"`
 }
 
 func (c *Client) CreateAccount(name string, Type string) (Account, error) {
@@ -46,8 +48,8 @@ func (c *Client) GetAccounts() ([]Account, error) {
 
 type DepositAddress struct {
 	Address   string `json:"address"`
-	Timestamp uint   `json:"timestamp"`
-	Label     string `json:"label,omitempty"`
+	Timestamp uint64 `json:"timestamp"`
+	Label     string `json:"label"`
 }
 
 func (c *Client) GetDepositAddresses(network Network, accountId string) ([]DepositAddress, error) {
