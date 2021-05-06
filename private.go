@@ -5,14 +5,76 @@ import (
 	"fmt"
 )
 
-type Account struct {
-	Name           string `json:"name"`
-	AccountName    string `json:"accountName"`
-	Account        string `json:"account"`
-	ShortName      string `json:"shortName"`
-	CounterpartyId string `json:"counterparty_id"`
-	Type           string `json:"type"`
-	Created        uint64 `json:"created"`
+func (c *Client) Balances(account string) ([]Balance, error) {
+	params := map[string]interface{}{
+		"account": account,
+	}
+
+	var balances []Balance
+
+	response, err := c.PrivateRequest(BalancesUri, params)
+	if err != nil {
+		return balances, err
+	}
+
+	err = json.Unmarshal(response, &balances)
+
+	return balances, err
+}
+
+func (c *Client) NotationalBalances(currency Currency, account string) ([]Balance, error) {
+	uri := fmt.Sprintf(NotationalBalancesUri, currency)
+
+	params := map[string]interface{}{
+		"account": account,
+	}
+
+	var notationalBalances []Balance
+
+	response, err := c.PrivateRequest(uri, params)
+	if err != nil {
+		return notationalBalances, err
+	}
+
+	err = json.Unmarshal(response, &notationalBalances)
+
+	return notationalBalances, err
+}
+
+func (c *Client) DepositAddresses(network Network, account string) ([]DepositAddress, error) {
+	uri := fmt.Sprintf(DepositAddressesUri, network)
+
+	params := map[string]interface{}{
+		"account": account,
+	}
+
+	var depositAddresses []DepositAddress
+
+	response, err := c.PrivateRequest(uri, params)
+	if err != nil {
+		return depositAddresses, err
+	}
+
+	err = json.Unmarshal(response, &depositAddresses)
+
+	return depositAddresses, err
+}
+
+func (c *Client) AccountDetail(account string) (AccountDetail, error) {
+	params := map[string]interface{}{
+		"account": account,
+	}
+
+	var accountDetail AccountDetail
+
+	response, err := c.PrivateRequest(AccountDetailUri, params)
+	if err != nil {
+		return accountDetail, err
+	}
+
+	err = json.Unmarshal(response, &accountDetail)
+
+	return accountDetail, err
 }
 
 func (c *Client) CreateAccount(name string, Type string) (Account, error) {
@@ -33,7 +95,7 @@ func (c *Client) CreateAccount(name string, Type string) (Account, error) {
 	return account, err
 }
 
-func (c *Client) GetAccounts() ([]Account, error) {
+func (c *Client) Accounts() ([]Account, error) {
 	var accounts []Account
 
 	response, err := c.PrivateRequest(AccountsUri, nil)
@@ -44,29 +106,4 @@ func (c *Client) GetAccounts() ([]Account, error) {
 	err = json.Unmarshal(response, &accounts)
 
 	return accounts, err
-}
-
-type DepositAddress struct {
-	Address   string `json:"address"`
-	Timestamp uint64 `json:"timestamp"`
-	Label     string `json:"label"`
-}
-
-func (c *Client) GetDepositAddresses(network Network, accountId string) ([]DepositAddress, error) {
-	uri := fmt.Sprintf(DepositAddressesUri, network)
-
-	params := map[string]interface{}{
-		"account": accountId,
-	}
-
-	var depositAddresses []DepositAddress
-
-	response, err := c.PrivateRequest(uri, params)
-	if err != nil {
-		return depositAddresses, err
-	}
-
-	err = json.Unmarshal(response, &depositAddresses)
-
-	return depositAddresses, err
 }
