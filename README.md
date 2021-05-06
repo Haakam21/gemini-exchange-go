@@ -1,2 +1,2 @@
-# Golang wrapper for the Gemini crypto exchange REST API
+# Gemini API Golang wrapper
 Work in progress
