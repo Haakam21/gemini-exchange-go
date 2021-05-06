@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (c *Client) Balances(account string) ([]Balance, error) {
+func (c *Client) Balances(account *string) ([]Balance, error) {
 	params := map[string]interface{}{
 		"account": account,
 	}
@@ -22,7 +22,7 @@ func (c *Client) Balances(account string) ([]Balance, error) {
 	return balances, err
 }
 
-func (c *Client) NotationalBalances(currency Currency, account string) ([]Balance, error) {
+func (c *Client) NotationalBalances(currency Currency, account *string) ([]Balance, error) {
 	uri := fmt.Sprintf(NotationalBalancesUri, currency)
 
 	params := map[string]interface{}{
@@ -41,7 +41,7 @@ func (c *Client) NotationalBalances(currency Currency, account string) ([]Balanc
 	return notationalBalances, err
 }
 
-func (c *Client) DepositAddresses(network Network, account string) ([]DepositAddress, error) {
+func (c *Client) DepositAddresses(network Network, account *string) ([]DepositAddress, error) {
 	uri := fmt.Sprintf(DepositAddressesUri, network)
 
 	params := map[string]interface{}{
@@ -60,7 +60,7 @@ func (c *Client) DepositAddresses(network Network, account string) ([]DepositAdd
 	return depositAddresses, err
 }
 
-func (c *Client) AccountDetail(account string) (AccountDetail, error) {
+func (c *Client) AccountDetail(account *string) (AccountDetail, error) {
 	params := map[string]interface{}{
 		"account": account,
 	}

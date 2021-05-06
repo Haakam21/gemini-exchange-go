@@ -11,7 +11,7 @@ type Balance struct {
 	Available                      string   `json:"available"`
 	AvailableNotional              string   `json:"availableNotional"`
 	AvailableForWithdrawal         string   `json:"availableForWithdrawal"`
-	AvailableForWithdrawalNotional uint64   `json:"availableForWithdrawalNotional"`
+	AvailableForWithdrawalNotional string   `json:"availableForWithdrawalNotional"`
 	Type                           string   `json:"type"`
 }
 
