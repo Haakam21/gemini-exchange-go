@@ -66,7 +66,7 @@ func (e *ApiError) Error() string {
 	return fmt.Sprintf("[%v] %v", e.Reason, e.Message)
 }
 
-func (c *Client) request(verb string, uri string, params map[string]interface{}) ([]byte, error) {
+func (c *Client) Request(verb string, uri string, params map[string]interface{}) ([]byte, error) {
 	url := c.url + uri
 
 	req, err := http.NewRequest(verb, url, bytes.NewBuffer([]byte{}))
@@ -111,12 +111,12 @@ func (c *Client) request(verb string, uri string, params map[string]interface{})
 }
 
 func (c *Client) PublicRequest(uri string) ([]byte, error) {
-	body, err := c.request("GET", uri, nil)
+	body, err := c.Request("GET", uri, nil)
 
 	return body, err
 }
 
-func nonce() int64 {
+func Nonce() int64 {
 	return time.Now().UnixNano()
 }
 
@@ -124,13 +124,13 @@ func (c *Client) PrivateRequest(uri string, params map[string]interface{}) ([]by
 	if params == nil {
 		params = map[string]interface{}{
 			"request": uri,
-			"nonce":   nonce(),
+			"nonce":   Nonce(),
 		}
 	} else {
 		params["request"] = uri
-		params["nonce"] = nonce()
+		params["nonce"] = Nonce()
 	}
 
-	body, err := c.request("POST", uri, params)
+	body, err := c.Request("POST", uri, params)
 	return body, err
 }

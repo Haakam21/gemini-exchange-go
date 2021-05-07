@@ -15,10 +15,47 @@ type Balance struct {
 	Type                           string   `json:"type"`
 }
 
+type Transfer struct {
+	Type        string   `json:"type"`
+	Status      string   `json:"status"`
+	Timestampms uint64   `json:"timestampms"`
+	Eid         uint     `json:"eid"`
+	AdvanceEid  uint     `json:"advanceEid"`
+	Currency    Currency `json:"currency"`
+	Amount      string   `json:"amount"`
+	Method      string   `json:"method"`
+	TxHash      string   `json:"txHash"`
+	OutputIdx   uint     `json:"outputIdx"`
+	Destination string   `json:"destination"`
+	Purpose     string   `json:"purpose"`
+}
+
+type CryptoWithdrawal struct {
+	Address      string `json:"address"`
+	Amount       string `json:"amount"`
+	TxHash       string `json:"txHash"`
+	WithdrawalID string `json:"withdrawalID"`
+	Result       string `json:"result"`
+	Reason       string `json:"reason"`
+	Message      string `json:"message"`
+}
+
 type DepositAddress struct {
 	Address   string `json:"address"`
 	Timestamp uint64 `json:"timestamp"`
 	Label     string `json:"label"`
+}
+
+type InternalTransfer struct {
+	FromAccount  string   `json:"fromAccount"`
+	ToAccount    string   `json:"toAccount"`
+	Amount       string   `json:"amount"`
+	Fee          uint     `json:"fee"`
+	Currency     Currency `json:"currency"`
+	WithdrawalID string   `json:"withdrawalID"`
+	UUID         string   `json:"uuid"`
+	Message      string   `json:"message"`
+	TxHash       string   `json:"txHash"`
 }
 
 type Account struct {
