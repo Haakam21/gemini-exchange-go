@@ -22,23 +22,23 @@ func (c *Client) Balances(account *string) ([]Balance, error) {
 	return balances, err
 }
 
-func (c *Client) NotationalBalances(currency Currency, account *string) ([]Balance, error) {
-	uri := fmt.Sprintf(NotationalBalancesUri, currency)
+func (c *Client) NotionalBalances(currency Currency, account *string) ([]Balance, error) {
+	uri := fmt.Sprintf(NotionalBalancesUri, currency)
 
 	params := map[string]interface{}{
 		"account": account,
 	}
 
-	var notationalBalances []Balance
+	var notionalBalances []Balance
 
 	response, err := c.PrivateRequest(uri, params)
 	if err != nil {
-		return notationalBalances, err
+		return notionalBalances, err
 	}
 
-	err = json.Unmarshal(response, &notationalBalances)
+	err = json.Unmarshal(response, &notionalBalances)
 
-	return notationalBalances, err
+	return notionalBalances, err
 }
 
 func (c *Client) Transfers(timestamp *uint64, limitTransfers *uint, account *string, completedAdvances *bool) ([]Transfer, error) {

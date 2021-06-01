@@ -31,8 +31,8 @@ const (
 	PastTradesUri   = "/v1/mytrades"
 
 	// fee and volume
-	NotationalVolumeUri = "/v1/notationalvolume"
-	TradeVolumeUri      = "/v1/tradevolume"
+	NotionalVolumeUri = "/v1/notionalvolume"
+	TradeVolumeUri    = "/v1/tradevolume"
 
 	// clearing
 	NewClearingOrderUri     = "/v1/clearing/new"
@@ -42,15 +42,15 @@ const (
 	ConfirmClearingOrderUri = "/v1/clearing/confirm"
 
 	// fund management
-	BalancesUri           = "/v1/balances"
-	NotationalBalancesUri = "/v1/notionalbalances/%s"
-	TransfersUri          = "/v1/transfers"
-	DepositAddressesUri   = "/v1/addresses/%s"
-	NewDepositAddressUri  = "/v1/deposit/%s/newAddress"
-	WithdrawCryptoUri     = "/v1/withdraw/%s"
-	InternalTransferUri   = "/v1/account/transfer/%s"
-	AddBankUri            = "/v1/payments/addbank"
-	PaymentMethodsUri     = "/v1/payments/methods"
+	BalancesUri          = "/v1/balances"
+	NotionalBalancesUri  = "/v1/notionalbalances/%s"
+	TransfersUri         = "/v1/transfers"
+	DepositAddressesUri  = "/v1/addresses/%s"
+	NewDepositAddressUri = "/v1/deposit/%s/newAddress"
+	WithdrawCryptoUri    = "/v1/withdraw/%s"
+	InternalTransferUri  = "/v1/account/transfer/%s"
+	AddBankUri           = "/v1/payments/addbank"
+	PaymentMethodsUri    = "/v1/payments/methods"
 
 	// approved address
 	RequestAddressUri    = "/v1/approvedAddresses/%s/request"
