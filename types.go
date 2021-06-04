@@ -61,7 +61,7 @@ type Transfer struct {
 	Type        string   `json:"type"`
 	Status      string   `json:"status"`
 	Timestampms uint64   `json:"timestampms"`
-	Eid         uint     `json:"eid"`
+	EID         uint     `json:"eid"`
 	AdvanceEid  uint     `json:"advanceEid"`
 	Currency    Currency `json:"currency"`
 	Amount      string   `json:"amount"`
@@ -76,7 +76,7 @@ type CryptoWithdrawal struct {
 	Address      string `json:"address"`
 	Amount       string `json:"amount"`
 	TxHash       string `json:"txHash"`
-	WithdrawalID string `json:"withdrawalID"`
+	WithdrawalId string `json:"withdrawalID"`
 	Result       string `json:"result"`
 	Reason       string `json:"reason"`
 	Message      string `json:"message"`
@@ -92,9 +92,9 @@ type InternalTransfer struct {
 	FromAccount  string   `json:"fromAccount"`
 	ToAccount    string   `json:"toAccount"`
 	Amount       string   `json:"amount"`
-	Fee          uint     `json:"fee"`
+	Fee          string   `json:"fee"`
 	Currency     Currency `json:"currency"`
-	WithdrawalID string   `json:"withdrawalID"`
+	WithdrawalId string   `json:"withdrawalId"`
 	UUID         string   `json:"uuid"`
 	Message      string   `json:"message"`
 	TxHash       string   `json:"txHash"`
