@@ -1,8 +1,50 @@
 package geminix
 
+type Symbol string
+
 type Currency string
 
 type Network string
+
+type Order struct {
+	OrderId           string   `json:"order_id"`
+	ClientOrderId     string   `json:"client_order_id"`
+	Symbol            string   `json:"symbol"`
+	Exchange          string   `json:"exchange"`
+	Price             string   `json:"price"`
+	AvgExecutionPrice string   `json:"avg_execution_price"`
+	Side              string   `json:"side"`
+	Type              string   `json:"type"`
+	Options           []string `json:"options"`
+	Timestamp         string   `json:"timestamp"`
+	Timestampms       uint64   `json:"timestampms"`
+	IsLive            bool     `json:"is_live"`
+	IsCancelled       bool     `json:"is_cancelled"`
+	Reason            string   `json:"reason"`
+	WasForced         bool     `json:"was_forced"`
+	ExecutedAmount    string   `json:"executed_amount"`
+	RemainingAmount   string   `json:"remaining_amount"`
+	OriginalAmount    string   `json:"original_amount"`
+	IsHidden          bool     `json:"is_hidden"`
+	Trades            []Trade  `json:"trades"`
+}
+
+type Trade struct {
+	Price         string `json:"price"`
+	Amount        string `json:"amount"`
+	Timestamp     uint64 `json:"timestamp"`
+	Timestampms   uint64 `json:"timestampms"`
+	Type          string `json:"type"`
+	Aggressor     bool   `json:"aggressor"`
+	FeeCurrency   string `json:"fee_currency"`
+	FeeAmount     string `json:"fee_amount"`
+	Tid           uint   `json:"tid"`
+	OrderId       string `json:"order_id"`
+	ClientOrderId string `json:"client_order_id"`
+	Exchange      string `json:"exchange"`
+	IsAuctionFill bool   `json:"is_auction_fill"`
+	Break         string `json:"break"`
+}
 
 type Balance struct {
 	Currency                       Currency `json:"currency"`

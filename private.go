@@ -5,6 +5,107 @@ import (
 	"fmt"
 )
 
+func (c *Client) NewOrder(clientOrderId *uint, symbol Symbol, amount string, minAmount *string, price string, side string, Type string, options *[]string, stopPrice *string, account *string) (Order, error) {
+	params := map[string]interface{}{
+		"client_order_id": clientOrderId,
+		"symbol":          symbol,
+		"amount":          amount,
+		"min_amount":      minAmount,
+		"price":           price,
+		"side":            side,
+		"type":            Type,
+		"options":         options,
+		"stop_price":      stopPrice,
+		"account":         account,
+	}
+
+	var order Order
+
+	response, err := c.PrivateRequest(NewOrderUri, params)
+	if err != nil {
+		return order, err
+	}
+
+	err = json.Unmarshal(response, &order)
+
+	return order, err
+}
+
+func (c *Client) CancelOrder(orderId uint, account *string) (Order, error) {
+	params := map[string]interface{}{
+		"order_id": orderId,
+		"account":  account,
+	}
+
+	var order Order
+
+	response, err := c.PrivateRequest(CancelOrderUri, params)
+	if err != nil {
+		return order, err
+	}
+
+	err = json.Unmarshal(response, &order)
+
+	return order, err
+}
+
+func (c *Client) OrderStatus(orderId uint, clientOrderId *uint, includeTrades *bool, account *string) (Order, error) {
+	params := map[string]interface{}{
+		"order_id":        orderId,
+		"client_order_id": clientOrderId,
+		"include_trades":  includeTrades,
+		"account":         account,
+	}
+
+	var order Order
+
+	response, err := c.PrivateRequest(OrderStatusUri, params)
+	if err != nil {
+		return order, err
+	}
+
+	err = json.Unmarshal(response, &order)
+
+	return order, err
+}
+
+func (c *Client) ActiveOrders(account *string) ([]Order, error) {
+	params := map[string]interface{}{
+		"account": account,
+	}
+
+	var orders []Order
+
+	response, err := c.PrivateRequest(ActiveOrdersUri, params)
+	if err != nil {
+		return orders, err
+	}
+
+	err = json.Unmarshal(response, &orders)
+
+	return orders, err
+}
+
+func (c *Client) PastTrades(symbol Symbol, limitTrades *uint, timestamp *uint64, account *string) ([]Trade, error) {
+	params := map[string]interface{}{
+		"symbol":       symbol,
+		"limit_trades": limitTrades,
+		"timestamp":    timestamp,
+		"account":      account,
+	}
+
+	var trades []Trade
+
+	response, err := c.PrivateRequest(PastTradesUri, params)
+	if err != nil {
+		return trades, err
+	}
+
+	err = json.Unmarshal(response, &trades)
+
+	return trades, err
+}
+
 func (c *Client) Balances(account *string) ([]Balance, error) {
 	params := map[string]interface{}{
 		"account": account,
