@@ -129,6 +129,12 @@ func (c *Client) PrivateRequest(uri string, params map[string]interface{}) ([]by
 	} else {
 		params["request"] = uri
 		params["nonce"] = Nonce()
+
+		/*for key, value := range params {
+			if value == nil {
+				delete(params, key)
+			}
+		}*/
 	}
 
 	body, err := c.Request("POST", uri, params)

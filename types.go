@@ -6,6 +6,13 @@ type Currency string
 
 type Network string
 
+type Ticker struct {
+	Bid    string                 `json:"bid"`
+	Ask    string                 `json:"ask"`
+	Last   string                 `json:"last"`
+	Volume map[string]interface{} `json:"volume"`
+}
+
 type Order struct {
 	OrderId           string   `json:"order_id"`
 	ClientOrderId     string   `json:"client_order_id"`
@@ -116,6 +123,10 @@ type User struct {
 	Status      string `json:"status"`
 	CountryCode string `json:"countryCode"`
 	IsVerified  string `json:"isVerified"`
+}
+
+type AddressRequest struct {
+	Message string `json:"message"`
 }
 
 type AccountDetail struct {

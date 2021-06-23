@@ -9,7 +9,8 @@ const (
 	// public
 	SymbolsUri        = "/v1/symbols"
 	SymbolDetailsUri  = "/v1/symbols/details"
-	TickerUri         = "/v2/ticker/%s"
+	TickerUri         = "/v1/pubticker/%s"
+	TickerV2Uri       = "/v2/ticker/%s"
 	CandlesUri        = "/v2/candles/%s/%s"
 	OrderBookUri      = "/v1/book/%s"
 	TradesUri         = "/v1/trades/%s"

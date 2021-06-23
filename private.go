@@ -223,6 +223,27 @@ func (c *Client) InternalTransfer(currency Currency, sourceAccount string, targe
 	return internalTransfer, err
 }
 
+func (c *Client) RequestAddress(network Network, address string, label string, account *string) (AddressRequest, error) {
+	uri := fmt.Sprintf(RequestAddressUri, network)
+
+	params := map[string]interface{}{
+		"address": address,
+		"label":   label,
+		"account": account,
+	}
+
+	var addressRequest AddressRequest
+
+	response, err := c.PrivateRequest(uri, params)
+	if err != nil {
+		return addressRequest, err
+	}
+
+	err = json.Unmarshal(response, &addressRequest)
+
+	return addressRequest, err
+}
+
 func (c *Client) AccountDetail(account *string) (AccountDetail, error) {
 	params := map[string]interface{}{
 		"account": account,
